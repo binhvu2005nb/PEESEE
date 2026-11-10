@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">PEESEE</string>
+    <string-array name="account_roles">
+        <item>Người mua</item>
+        <item>Người bán</item>
+    </string-array>
+</resources>

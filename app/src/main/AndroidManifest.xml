@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.PEESEE">
+
+        <!-- Trang dang nhap: man hinh khoi dong -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <!-- Trang dang ky -->
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Trang chu -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".OrderActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReviewActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SellerHomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SellerProductActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SellerOrderActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SellerReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RevenueActivity"
+            android:exported="false" />
+
+        <!-- Trang danh mục -->
+        <activity
+            android:name=".CategoryActivity"
+            android:exported="false" />
+
+
+    </application>
+
+</manifest>
