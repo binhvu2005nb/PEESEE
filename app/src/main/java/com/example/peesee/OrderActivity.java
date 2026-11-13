@@ -575,15 +575,8 @@ public class OrderActivity extends Activity {
         ip.leftMargin = dp(5);
         actions.addView(invoice, ip);
 
-        Button update = new Button(this);
-        update.setText("Cập nhật");
-        update.setTextSize(10);
-        update.setAllCaps(false);
 
-        LinearLayout.LayoutParams up =
-                new LinearLayout.LayoutParams(0, dp(38), 1);
-        up.leftMargin = dp(5);
-        actions.addView(update, up);
+
 
         LinearLayout.LayoutParams ap = lp(-1, 40);
         ap.topMargin = dp(5);
@@ -591,7 +584,7 @@ public class OrderActivity extends Activity {
 
         detail.setOnClickListener(v -> showDetails(order));
         invoice.setOnClickListener(v -> showInvoice(order));
-        update.setOnClickListener(v -> updateStatus(order));
+
     }
 
     private void showDetails(Order order) {
@@ -717,31 +710,6 @@ public class OrderActivity extends Activity {
                 .show();
     }
 
-    private void updateStatus(Order order) {
-        if (order.status.equals("Đã hủy")
-                || order.status.equals("Đã giao")) {
-            toast("Đơn hàng này không cần cập nhật trạng thái");
-            return;
-        }
-
-        String[] choices = {
-                "Chờ xác nhận",
-                "Đang xử lý",
-                "Đang giao",
-                "Đã giao",
-                "Đã hủy"
-        };
-
-        new AlertDialog.Builder(this)
-                .setTitle("Cập nhật trạng thái mẫu")
-                .setItems(choices, (dialog, which) -> {
-                    order.status = choices[which];
-                    renderFilters();
-                    renderOrders();
-                    toast("Đã cập nhật trạng thái mẫu");
-                })
-                .show();
-    }
 
     private void showInvoice(Order order) {
         String invoice =

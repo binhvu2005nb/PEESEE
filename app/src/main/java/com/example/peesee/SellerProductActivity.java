@@ -293,6 +293,14 @@ public class SellerProductActivity extends Activity {
             oldPriceParams.topMargin = dp(8);
             card.addView(oldPrice, oldPriceParams);
 
+            TextView stockText = text(
+                    "Tồn kho: " + product.stock + " sản phẩm",
+                    12, product.stock > 0 ? GREEN : RED, true
+            );
+            LinearLayout.LayoutParams stockParams = lp(-1, -2);
+            stockParams.topMargin = dp(5);
+            card.addView(stockText, stockParams);
+
             // Nút sửa và xóa
             LinearLayout actions = row();
 
@@ -391,6 +399,15 @@ public class SellerProductActivity extends Activity {
         );
         addFormInput(form, oldPriceInput);
 
+        EditText stockInput = createInput(
+                "Số lượng tồn kho (chỉ nhập số)",
+                isEdit ? String.valueOf(oldProduct.stock) : "0"
+        );
+        stockInput.setInputType(
+                android.text.InputType.TYPE_CLASS_NUMBER
+        );
+        addFormInput(form, stockInput);
+
         ScrollView formScroll = new ScrollView(this);
         formScroll.addView(form);
 
@@ -412,10 +429,12 @@ public class SellerProductActivity extends Activity {
                     priceInput.getText().toString().trim();
             String oldPriceString =
                     oldPriceInput.getText().toString().trim();
+            String stockString =
+                    stockInput.getText().toString().trim();
 
             if (name.isEmpty() || type.isEmpty()
                     || icon.isEmpty() || priceString.isEmpty()
-                    || oldPriceString.isEmpty()) {
+                    || oldPriceString.isEmpty() || stockString.isEmpty()) {
                 Toast.makeText(this,
                         "Vui lòng nhập đầy đủ thông tin.",
                         Toast.LENGTH_SHORT).show();
@@ -424,13 +443,22 @@ public class SellerProductActivity extends Activity {
 
             int price;
             int oldPrice;
+            int stock;
 
             try {
                 price = Integer.parseInt(priceString);
                 oldPrice = Integer.parseInt(oldPriceString);
+                stock = Integer.parseInt(stockString);
             } catch (NumberFormatException e) {
                 Toast.makeText(this,
                         "Giá sản phẩm không hợp lệ.",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (stock < 0) {
+                Toast.makeText(this,
+                        "Số lượng tồn kho không được âm.",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -463,11 +491,12 @@ public class SellerProductActivity extends Activity {
                 product.price = price;
                 product.oldPrice = oldPrice;
                 product.discount = discount;
+                product.stock = stock;
             } else {
                 ProductManager.products.add(
                         new ProductManager.Product(
                                 name, type, icon,
-                                price, oldPrice, discount, 0
+                                price, oldPrice, discount, 0, stock
                         )
                 );
             }

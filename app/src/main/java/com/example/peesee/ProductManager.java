@@ -13,10 +13,11 @@ public class ProductManager {
         public int oldPrice;
         public int discount;
         public int rating;
+        public int stock;
 
         public Product(String name, String type, String icon,
                        int price, int oldPrice,
-                       int discount, int rating) {
+                       int discount, int rating, int stock) {
             this.name = name;
             this.type = type;
             this.icon = icon;
@@ -24,44 +25,58 @@ public class ProductManager {
             this.oldPrice = oldPrice;
             this.discount = discount;
             this.rating = rating;
+            this.stock = stock;
         }
     }
 
-    public static final ArrayList<Product> products = new ArrayList<>();
+    public static final ArrayList<Product> products =
+            new ArrayList<>();
 
     public static void initialize() {
         if (!products.isEmpty()) return;
 
         products.add(new Product(
                 "Logitech G Pro X Superlight", "Chuột", "🖱️",
-                2399000, 2990000, 20, 49));
+                2399000, 2990000, 20, 49, 15));
 
         products.add(new Product(
                 "Laptop gaming Acer Aspire 7", "Laptop", "💻",
-                17990000, 21990000, 15, 48));
+                17990000, 21990000, 15, 48, 5));
 
         products.add(new Product(
                 "Keychron K8 Pro RGB", "Bàn phím", "⌨️",
-                2289000, 2690000, 15, 48));
+                2289000, 2690000, 15, 48, 10));
 
         products.add(new Product(
                 "HyperX Cloud II", "Tai nghe", "🎧",
-                1869000, 2190000, 18, 49));
+                1869000, 2190000, 18, 49, 8));
 
         products.add(new Product(
                 "Logitech G502 HERO", "Chuột", "🖱️",
-                1299000, 1590000, 18, 49));
+                1299000, 1590000, 18, 49, 20));
 
         products.add(new Product(
                 "Razer BlackWidow V3", "Bàn phím", "⌨️",
-                2549000, 2999000, 15, 47));
+                2549000, 2999000, 15, 47, 7));
 
         products.add(new Product(
                 "LG UltraGear", "Màn hình", "🖥️",
-                4990000, 5590000, 11, 48));
+                4990000, 5590000, 11, 48, 6));
 
         products.add(new Product(
                 "Gaming PC Basic", "PC", "🖥️",
-                15990000, 17990000, 11, 49));
+                15990000, 17990000, 11, 49, 4));
+    }
+
+    public static Product findProduct(String name) {
+        initialize();
+
+        for (Product product : products) {
+            if (product.name.equals(name)) {
+                return product;
+            }
+        }
+
+        return null;
     }
 }

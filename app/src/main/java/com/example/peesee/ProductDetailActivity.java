@@ -22,6 +22,7 @@ public class ProductDetailActivity extends Activity {
     int GRAY = Color.rgb(115, 125, 143);
 
     String name, type, icon, description;
+    int stock = 0;
     int price, oldPrice, discount;
     int quantity = 1;
     TextView quantityText, totalPriceText;
@@ -85,6 +86,12 @@ public class ProductDetailActivity extends Activity {
         price = intent.getIntExtra("price", 1299000);
         oldPrice = intent.getIntExtra("oldPrice", price);
         discount = intent.getIntExtra("discount", 0);
+        ProductManager.Product product =
+                ProductManager.findProduct(name);
+
+        if (product != null) {
+            stock = product.stock;
+        }
 
         if (name == null) name = "Sản phẩm PEESEE";
         if (type == null) type = "Phụ kiện máy tính";
@@ -240,12 +247,17 @@ public class ProductDetailActivity extends Activity {
         });
 
         plus.setOnClickListener(v -> {
-            if (quantity < 99) {
-                quantity++;
-                updateQuantity();
-            }
-        });
 
+            if (quantity >= stock) {
+                Toast.makeText(this,
+                        "Số lượng vượt quá tồn kho!",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            quantity++;
+            updateQuantity();
+        });
         divider(body);
 
         // Thông tin sản phẩm
@@ -366,22 +378,38 @@ public class ProductDetailActivity extends Activity {
         quantityText.setText(String.valueOf(quantity));
     }
 
+
     void addToCart(boolean buyNow) {
-        CartActivity.addItem(name, type, icon, price, oldPrice);
+
+        boolean added = CartActivity.addItem(
+                name,
+                type,
+                icon,
+                price,
+                oldPrice,
+                stock,
+                quantity
+        );
+
+        if (!added) {
+            Toast.makeText(this,
+                    stock <= 0
+                            ? "Sản phẩm đã hết hàng!"
+                            : "Số lượng vượt quá tồn kho!",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (buyNow) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Sản phẩm đã được thêm")
-                    .setMessage("Bạn có thể tiếp tục kiểm tra giỏ hàng "
-                            + "trước khi xác nhận đơn.")
-                    .setNegativeButton("Tiếp tục mua", null)
-                    .setPositiveButton("Xem giỏ hàng",
-                            (dialog, which) -> startActivity(
-                                    new Intent(this, CartActivity.class)))
-                    .show();
+            startActivity(new Intent(
+                    this,
+                    CartActivity.class
+            ));
         } else {
-            Toast.makeText(this, "Đã thêm vào giỏ hàng",
+            Toast.makeText(this,
+                    "Đã thêm vào giỏ hàng!",
                     Toast.LENGTH_SHORT).show();
         }
     }
+
 }

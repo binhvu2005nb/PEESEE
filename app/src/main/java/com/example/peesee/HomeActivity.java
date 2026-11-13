@@ -1041,16 +1041,19 @@ public class HomeActivity extends Activity {
             return;
         }
 
-        CartActivity.addItem(
+        boolean added = CartActivity.addItem(
                 product.name,
                 product.type,
                 product.icon,
                 product.price,
-                product.oldPrice
+                product.oldPrice,
+                product.stock,
+                1
         );
 
-        if (cartCount != null) {
-            cartCount.setText("Đã thêm");
+        if (!added) {
+            showMessage("Sản phẩm đã hết hàng!");
+            return;
         }
 
         showMessage("Đã thêm sản phẩm vào giỏ hàng");
@@ -1075,6 +1078,7 @@ public class HomeActivity extends Activity {
         intent.putExtra("price", product.price);
         intent.putExtra("oldPrice", product.oldPrice);
         intent.putExtra("discount", product.discount);
+        intent.putExtra("stock", product.stock);
 
         intent.putExtra(
                 "description",

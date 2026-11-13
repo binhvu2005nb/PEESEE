@@ -28,18 +28,22 @@ public class CartActivity extends Activity {
         String name;
         String type;
         String icon;
+        int stock;
         int price;
         int oldPrice;
         int quantity = 1;
         boolean selected = true;
 
         Item(String name, String type, String icon,
-             int price, int oldPrice) {
+             int price, int oldPrice, int stock, int quantity) {
+
             this.name = name;
             this.type = type;
             this.icon = icon;
             this.price = price;
             this.oldPrice = oldPrice;
+            this.stock = stock;
+            this.quantity = quantity;
         }
     }
 
@@ -68,19 +72,41 @@ public class CartActivity extends Activity {
     }
 
     // Thêm sản phẩm vào giỏ.
-    public static void addItem(String name, String type, String icon,
-                               int price, int oldPrice) {
+
+    public static boolean addItem(
+            String name, String type, String icon,
+            int price, int oldPrice,
+            int stock, int quantity) {
+
+        if (stock <= 0 || quantity <= 0) {
+            return false;
+        }
+
+        if (quantity > stock) {
+            return false;
+        }
+
         for (Item item : cartItems) {
             if (item.name.equals(name)) {
-                item.quantity++;
-                return;
+
+                if (item.quantity + quantity > stock) {
+                    return false;
+                }
+
+                item.quantity += quantity;
+                item.stock = stock;
+                return true;
             }
         }
 
         cartItems.add(new Item(
-                name, type, icon, price, oldPrice
+                name, type, icon,
+                price, oldPrice, stock, quantity
         ));
+
+        return true;
     }
+
 
     private GradientDrawable background(int color, int radius) {
         GradientDrawable drawable = new GradientDrawable();
@@ -132,6 +158,7 @@ public class CartActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ProductManager.initialize();
         buildPage();
     }
 
@@ -478,12 +505,14 @@ public class CartActivity extends Activity {
         });
 
         plus.setOnClickListener(v -> {
-            if (item.quantity < 99) {
-                item.quantity++;
-                buildPage();
-            } else {
-                toast("Số lượng tối đa là 99");
+
+            if (item.quantity >= item.stock) {
+                toast("Số lượng vượt quá tồn kho!");
+                return;
             }
+
+            item.quantity++;
+            buildPage();
         });
 
         card.addView(info,
@@ -556,20 +585,68 @@ public class CartActivity extends Activity {
             return;
         }
 
+        // Kiểm tra tồn kho hiện tại trước khi yêu cầu xác nhận.
+        for (Item item : cartItems) {
+            if (!item.selected) {
+                continue;
+            }
+
+            ProductManager.Product product =
+                    ProductManager.findProduct(item.name);
+
+            if (product == null) {
+                toast("Không tìm thấy sản phẩm: " + item.name);
+                return;
+            }
+
+            if (item.quantity <= 0 || product.stock < item.quantity) {
+                toast("Sản phẩm " + item.name
+                        + " không đủ tồn kho. Hiện còn "
+                        + product.stock + " sản phẩm.");
+                return;
+            }
+        }
+
         int total = subtotal() - discountAmount();
 
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận thanh toán")
                 .setMessage(
                         "Tổng thanh toán: " + money(total)
-                                + "\n\nXác nhận tạo đơn hàng của bạn?"
+                                + "\\n\\nXác nhận tạo đơn hàng của bạn?"
                 )
                 .setNegativeButton("Quay lại", null)
                 .setPositiveButton("Xác nhận", (dialog, which) -> {
+
+                    // Kiểm tra lại tồn kho ngay lúc xác nhận thanh toán.
+                    // Chưa tạo đơn và chưa trừ kho nếu có bất kỳ sản phẩm nào thiếu.
+                    for (Item item : cartItems) {
+                        if (!item.selected) {
+                            continue;
+                        }
+
+                        ProductManager.Product product =
+                                ProductManager.findProduct(item.name);
+
+                        if (product == null
+                                || item.quantity <= 0
+                                || product.stock < item.quantity) {
+                            int available = product == null ? 0 : product.stock;
+                            toast("Không đủ tồn kho cho " + item.name
+                                    + ". Hiện còn " + available + " sản phẩm.");
+                            buildPage();
+                            return;
+                        }
+                    }
+
+                    // Tạo đơn hàng và trừ tồn kho cho từng sản phẩm đã chọn.
                     for (int i = cartItems.size() - 1; i >= 0; i--) {
                         Item item = cartItems.get(i);
 
                         if (item.selected) {
+                            ProductManager.Product product =
+                                    ProductManager.findProduct(item.name);
+
                             OrderActivity.createOrder(
                                     item.name,
                                     item.type,
@@ -577,6 +654,9 @@ public class CartActivity extends Activity {
                                     item.price,
                                     item.quantity
                             );
+
+                            // Trừ tồn kho trong bộ nhớ ứng dụng.
+                            product.stock -= item.quantity;
 
                             cartItems.remove(i);
                         }
@@ -586,7 +666,7 @@ public class CartActivity extends Activity {
 
                     Toast.makeText(
                             CartActivity.this,
-                            "Đặt hàng thành công!",
+                            "Đặt hàng thành công! Tồn kho đã được cập nhật.",
                             Toast.LENGTH_SHORT
                     ).show();
 

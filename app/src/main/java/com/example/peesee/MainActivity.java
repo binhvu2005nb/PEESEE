@@ -83,6 +83,11 @@ public class MainActivity extends Activity {
 
                 intent.putExtra("account", ADMIN_ACCOUNT);
                 intent.putExtra("name", "Admin PEESEE");
+                data.edit()
+                        .putString("current_account", ADMIN_ACCOUNT)
+                        .putString("current_role", "admin")
+                        .apply();
+
 
                 startActivity(intent);
                 finish();
@@ -119,6 +124,10 @@ public class MainActivity extends Activity {
                     "name",
                     data.getString(prefix + "name", "")
             );
+            data.edit()
+                    .putString("current_account", account)
+                    .putString("current_role", "buyer")
+                    .apply();
 
             startActivity(intent);
             finish();

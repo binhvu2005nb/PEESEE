@@ -38,6 +38,23 @@ public class SellerOrderActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        String role = getSharedPreferences(
+                "PEESEE",
+                MODE_PRIVATE
+        ).getString("current_role", "");
+
+        if (!"admin".equals(role)
+                && !"seller".equals(role)) {
+
+            Toast.makeText(this,
+                    "Bạn không có quyền truy cập!",
+                    Toast.LENGTH_SHORT).show();
+
+            finish();
+            return;
+        }
+
         buildPage();
     }
 
